@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import pytz
 from time import sleep
 import pyttsx3
+import subprocess
 
 
 """
@@ -20,6 +21,7 @@ target_time = sys.argv[2]
 #Load environmental variables for API Key
 load_dotenv()
 app_key = os.environ.get("app_key")
+voice_key = os.environ.get("voice_key")
 
 """
 Station class stores station data.
@@ -112,6 +114,33 @@ def speak(engine, notification):
     engine.say(notification)
     print("Spoken")
     engine.runAndWait()
+
+def ai_speak(notification):
+    CHUNK_SIZE = 1024
+    url = "https://api.elevenlabs.io/v1/text-to-speech/Xb7hH8MSUJpSbSDYk0k2"
+
+    headers = {
+    "Accept": "audio/mpeg",
+    "Content-Type": "application/json",
+    "xi-api-key": voice_key
+    }
+
+    data = {
+    "text": notification,
+    "model_id": "eleven_monolingual_v1",
+    "voice_settings": {
+        "stability": 0.5,
+        "similarity_boost": 0.5
+    }
+    }
+
+    response = requests.post(url, json=data, headers=headers)
+    with open('output.mp3', 'wb') as f:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
+        
+    subprocess.call(['xdg-open','/home/finncharlton/Documents/WombleBot/output.mp3'])
 
 def main(station_argument, target_time):
     chosen_station = station(station_argument)
