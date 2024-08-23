@@ -78,17 +78,15 @@ def get_wim_arrivals(station_object):
         print("Arrival Endpoint Connection Successful")
 
     content = json.loads(response._content)
-
     arrival_list = [arrival(arr['id'], 
-                            arr['destinationName'], 
+                            arr['towards'], 
                             arr['currentLocation'], 
                             arr['expectedArrival'],
                             arr['lineName'])
                         for arr in content]
 
-    wim_arrival_list = [train for train in arrival_list if train.destination == "Wimbledon Underground Station"]
+    wim_arrival_list = [train for train in arrival_list if train.destination == "Wimbledon"]
     sorted_wim_arrival_list = sorted(wim_arrival_list, key= lambda train: train.arriving)
-
     return sorted_wim_arrival_list
 
 def format_notification(arrival_list_for_formatting):
@@ -100,13 +98,15 @@ def format_notification(arrival_list_for_formatting):
         print("No trains found")
 
 def send_notification(arrival_list_for_testing, target_time, tested_trains):
-    if arrival_list_for_testing[0].arriving_in <= float(target_time) and arrival_list_for_testing[0].id not in set(tested_trains):
+    if len(arrival_list_for_testing) == 0:
+        return ""
+    elif arrival_list_for_testing[0].arriving_in <= float(target_time) and arrival_list_for_testing[0].id not in set(tested_trains):
         tested_trains.append(arrival_list_for_testing[0].id)
         notification = format_notification(arrival_list_for_testing)
         return notification
     else:
         print("No notification required")
-        return " "
+        return ""
 
 def speak(engine, notification):
     engine.say(notification)
@@ -117,14 +117,18 @@ def main(station_argument, target_time):
     chosen_station = station(station_argument)
     tested_trains = []
     engine = pyttsx3.init()
-    engine.setProperty('volume',10.0)
+    engine.setProperty('volume',5.0)
     engine.setProperty('rate', 175)
+    speak(engine, "WombleBot Active")
 
     while True:
         main_arrival_list = get_wim_arrivals(chosen_station)
         main_notification = send_notification(main_arrival_list, target_time, tested_trains)
-        speak(engine, main_notification)
-        sleep(60)
+        if main_notification == "":
+            pass
+        else:
+            speak(engine, main_notification)
+        sleep(30)
 
     
 if __name__ == "__main__":
