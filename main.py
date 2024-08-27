@@ -127,7 +127,7 @@ def main(station_argument, target_time):
     chosen_station = station(station_argument)
     tested_trains = []
     engine = pyttsx3.init()
-    engine.setProperty('volume',1.0)
+    engine.setProperty('volume',20.0)
     engine.setProperty('rate', 175)
     speak(engine, "WombleBot Active")
 
