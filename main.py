@@ -61,7 +61,7 @@ class station:
 
     #Init forms query for searching the StopPoint/Search endpoint. This is used to retrieve the ID of the specified station
     def __init__(self, name_search):
-        query_base_url = 'https://api.tfl.gov.uk/StopPoint/Searchw/'
+        query_base_url = 'https://api.tfl.gov.uk/StopPoint/Search/'
         query_url = f'{query_base_url}{name_search}?modes=tube&app_key={app_key}'
         
         #Get response
