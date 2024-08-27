@@ -221,7 +221,7 @@ def main(station_argument, target_time):
 
     #Initialise intial conditions for loop
     run_counter = 0
-    target_runs = 120
+    target_runs = 180
 
     #Play Activation Message to show initialisation has been successful
     speak(engine, "WombleBot Active")
