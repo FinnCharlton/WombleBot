@@ -9,6 +9,10 @@ from time import sleep
 import pyttsx3
 import subprocess
 
+runtime = str(datetime.now())
+f = open("runs.txt","w")
+f.write(runtime)
+
 """
 Script takes two arguments:
     - Departure Station
@@ -93,7 +97,7 @@ def get_wim_arrivals(station_object):
     wim_arrival_list = [train for train in arrival_list if train.destination == "Wimbledon"]
     sorted_wim_arrival_list = sorted(wim_arrival_list, key= lambda train: train.arriving)
     return sorted_wim_arrival_list
-    
+
 
 def format_notification(arrival_list_for_formatting):
     if len(arrival_list_for_formatting) > 1:
@@ -123,7 +127,7 @@ def main(station_argument, target_time):
     chosen_station = station(station_argument)
     tested_trains = []
     engine = pyttsx3.init()
-    engine.setProperty('volume',5.0)
+    engine.setProperty('volume',1.0)
     engine.setProperty('rate', 175)
     speak(engine, "WombleBot Active")
 
@@ -138,6 +142,7 @@ def main(station_argument, target_time):
         else:
             speak(engine, main_notification)
         sleep(30)
+        run_counter += 1
 
     
 if __name__ == "__main__":
