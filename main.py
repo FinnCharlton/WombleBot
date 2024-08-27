@@ -9,7 +9,6 @@ from time import sleep
 import pyttsx3
 import subprocess
 
-
 """
 Script takes two arguments:
     - Departure Station
@@ -18,10 +17,13 @@ Script takes two arguments:
 departure_station = sys.argv[1]
 target_time = sys.argv[2]
 
-#Load environmental variables for API Key
+"""
+Load environmental variables for API Keys
+"""
 load_dotenv()
 app_key = os.environ.get("app_key")
-voice_key = os.environ.get("voice_key")
+# voice_key = os.environ.get("voice_key")
+
 
 """
 Station class stores station data.
@@ -64,6 +66,7 @@ class arrival:
         self.arriving = datetime.strptime(arriving, r'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.timezone("Europe/London"))
         self.arriving_in = (self.arriving - datetime.now(tz=pytz.timezone("Europe/London"))).total_seconds() / 60
 
+
 """
 The get_arrivals function returns a list of trains departing for Wimbledon,
 sorted by time to arrival
@@ -90,6 +93,7 @@ def get_wim_arrivals(station_object):
     wim_arrival_list = [train for train in arrival_list if train.destination == "Wimbledon"]
     sorted_wim_arrival_list = sorted(wim_arrival_list, key= lambda train: train.arriving)
     return sorted_wim_arrival_list
+    
 
 def format_notification(arrival_list_for_formatting):
     if len(arrival_list_for_formatting) > 1:
@@ -115,33 +119,6 @@ def speak(engine, notification):
     print("Spoken")
     engine.runAndWait()
 
-def ai_speak(notification):
-    CHUNK_SIZE = 1024
-    url = "https://api.elevenlabs.io/v1/text-to-speech/Xb7hH8MSUJpSbSDYk0k2"
-
-    headers = {
-    "Accept": "audio/mpeg",
-    "Content-Type": "application/json",
-    "xi-api-key": voice_key
-    }
-
-    data = {
-    "text": notification,
-    "model_id": "eleven_monolingual_v1",
-    "voice_settings": {
-        "stability": 0.5,
-        "similarity_boost": 0.5
-    }
-    }
-
-    response = requests.post(url, json=data, headers=headers)
-    with open('output.mp3', 'wb') as f:
-        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-            if chunk:
-                f.write(chunk)
-        
-    subprocess.call(['xdg-open','/home/finncharlton/Documents/WombleBot/output.mp3'])
-
 def main(station_argument, target_time):
     chosen_station = station(station_argument)
     tested_trains = []
@@ -150,7 +127,10 @@ def main(station_argument, target_time):
     engine.setProperty('rate', 175)
     speak(engine, "WombleBot Active")
 
-    while True:
+    run_counter = 0
+    target_runs = 120
+
+    while run_counter < target_runs:
         main_arrival_list = get_wim_arrivals(chosen_station)
         main_notification = send_notification(main_arrival_list, target_time, tested_trains)
         if main_notification == "":
